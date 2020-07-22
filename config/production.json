@@ -1,0 +1,4 @@
+{
+    "mongoURI": "mongodb+srv://david:david@zoocial.ontdw.mongodb.net/database?retryWrites=true&w=majority",
+    "jwtSecret": "secret"
+}
