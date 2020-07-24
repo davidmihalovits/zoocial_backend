@@ -26,11 +26,7 @@ exports.likePost = async (req, res) => {
         await post.updateOne({ $push: { likedBy: user._id } });
         await user.updateOne({ $push: { likes: post._id } });
 
-        /*let u = await User.findById(req.user.id).populate(
-            "posts followers following"
-        );*/
-
-        let p = await Post.findById(req.params.id).populate("by");
+        let p = await Post.findById(req.params.id).populate("by ");
 
         return res.json(p);
     } catch (err) {

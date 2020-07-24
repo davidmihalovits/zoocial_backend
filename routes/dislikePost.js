@@ -17,11 +17,7 @@ exports.dislikePost = async (req, res) => {
             await post.updateOne({ $pull: { dislikedBy: user._id } });
             await user.updateOne({ $pull: { dislikes: post._id } });
 
-            /*let u = await User.findById(req.user.id).populate(
-                "posts followers following"
-            );*/
-
-            let p = await Post.findById(req.params.id).populate("by");
+            let p = await Post.findById(req.params.id).populate("by ");
 
             return res.json(p);
         }
@@ -29,10 +25,6 @@ exports.dislikePost = async (req, res) => {
         await post.updateOne({ $inc: { dislikes: +1 } });
         await post.updateOne({ $push: { dislikedBy: user._id } });
         await user.updateOne({ $push: { dislikes: post._id } });
-
-        /*let u = await User.findById(req.user.id).populate(
-            "posts followers following"
-        );*/
 
         let p = await Post.findById(req.params.id).populate("by");
 

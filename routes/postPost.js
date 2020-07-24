@@ -10,6 +10,7 @@ exports.postPost = async (req, res) => {
             by: user._id,
             likes: 0,
             dislikes: 0,
+            commentCount: 0,
         });
 
         await newPost
@@ -17,10 +18,6 @@ exports.postPost = async (req, res) => {
             .then((newPost) => newPost.populate("by").execPopulate());
 
         await user.updateOne({ $push: { posts: newPost._id } });
-
-        let u = await User.findById(req.user.id).populate(
-            "posts followers following"
-        );
 
         let p = newPost;
 

@@ -5,7 +5,7 @@ exports.getMyPosts = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
 
-        let posts = await Post.find({ by: user._id });
+        let posts = await Post.find({ by: user._id }).populate("by ");
 
         return res.json(posts);
     } catch (err) {

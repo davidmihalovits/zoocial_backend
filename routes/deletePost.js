@@ -19,9 +19,6 @@ exports.deletePost = async (req, res) => {
             await User.updateMany({
                 $pull: { likes: post._id, dislikes: post._id },
             });
-            let u = await User.findById(req.user.id).populate(
-                "posts followers following"
-            );
 
             let p = await Post.find({ by: user._id });
 
