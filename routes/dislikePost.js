@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
+const Notification = require("../models/Notification");
 
 exports.dislikePost = async (req, res) => {
     try {
@@ -28,7 +29,19 @@ exports.dislikePost = async (req, res) => {
 
         let p = await Post.findById(req.params.id).populate("by");
 
-        return res.json(p);
+        if (JSON.stringify(user._id) === JSON.stringify(p.by._id)) {
+            return res.json(p);
+        } else {
+            let newNotification = new Notification({
+                notification: `${user.username} disliked your post!`,
+                sender: user._id,
+                recipient: p.by._id,
+                read: false,
+                post: p,
+            });
+            await newNotification.save();
+            return res.json(p);
+        }
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server error");
