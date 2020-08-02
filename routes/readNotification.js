@@ -16,7 +16,7 @@ exports.readNotification = async (req, res) => {
 
         let notifications = await Notification.find({
             recipient: user._id,
-        });
+        }).populate("sender");
 
         return res.json(notifications);
     } catch (err) {

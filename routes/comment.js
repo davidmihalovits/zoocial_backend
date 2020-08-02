@@ -20,7 +20,19 @@ exports.comment = async (req, res) => {
 
         await post.updateOne({ $inc: { commentCount: +1 } });
 
-        return res.json(newComment);
+        if (JSON.stringify(user._id) === JSON.stringify(post.by._id)) {
+            return res.json(newComment);
+        } else {
+            let newNotification = new Notification({
+                notification: `${user.username} commented on your post!`,
+                sender: user._id,
+                recipient: post.by._id,
+                read: false,
+                post: post,
+            });
+            await newNotification.save();
+            return res.json(newComment);
+        }
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server error");

@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Notification = require("../models/Notification");
 
 exports.follow = async (req, res) => {
     try {
@@ -26,6 +27,16 @@ exports.follow = async (req, res) => {
         let au = await User.findById(req.params.id).populate(
             "following followers posts"
         );
+
+        let newNotification = new Notification({
+            notification: `${user.username} started following you!`,
+            sender: user._id,
+            recipient: au._id,
+            read: false,
+            post: null,
+        });
+
+        await newNotification.save();
 
         return res.json(au);
     } catch (error) {

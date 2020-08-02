@@ -56,40 +56,81 @@ app.put("/follow/:id", auth, follow);
 app.put("/readNotification", auth, readNotification);
 app.delete("/deletePost/:id", auth, deletePost);
 
-/*const socketUsers = {};
+const socketUsers = {};
 io.on("connection", (socket) => {
     socket.on("user", (user) => {
         const aUser = { socket: socket, user: user };
         socketUsers[socket.id] = aUser;
-        console.log(aUser.socket.id + " connected " + aUser.user.username);
-        console.log(socketUsers);
     });
 
     socket.on("disconnect", () => {
         delete socketUsers[socket.id];
-        console.log(socketUsers);
     });
-});*/
 
-/*socket.on("like", async (user, post) => {
-    if (!post.post.likedBy.includes(user.user._id)) {
-        const Notification = require("./models/Notification");
+    socket.on("like", async (user, post) => {
+        if (!post.post.likedBy.includes(user.user._id)) {
+            let recipients = Object.values(socketUsers).map((u) => u);
 
-        let newNotification = new Notification({
-            notification: `${user.user.username} liked your post!`,
-            sender: user.user._id,
-            recipient: post.post.by._id,
-            read: false,
-        });
+            let recipient = await recipients.find(
+                (u) => u.user._id == post.post.by._id
+            );
 
-        await newNotification.save();
+            if (!recipient) {
+                return;
+            }
 
-        let abc = await u.find((u) => u.id._id === post.post.by._id);
-        abc.socket.emit("notification");
+            recipient.socket.emit("notification");
+        }
+    });
 
-        console.log(u);
-    }
-});*/
+    socket.on("dislike", async (user, post) => {
+        if (!post.post.dislikedBy.includes(user.user._id)) {
+            let recipients = Object.values(socketUsers).map((u) => u);
+
+            let recipient = await recipients.find(
+                (u) => u.user._id == post.post.by._id
+            );
+
+            if (!recipient) {
+                return;
+            }
+
+            recipient.socket.emit("notification");
+        }
+    });
+
+    socket.on("comment", async (comment) => {
+        let recipients = Object.values(socketUsers).map((u) => u);
+
+        let recipient = await recipients.find(
+            (u) => u.user._id == comment.user.by._id
+        );
+
+        if (!recipient) {
+            return;
+        }
+
+        recipient.socket.emit("notification");
+    });
+
+    socket.on("follow", async (id) => {
+        let recipients = Object.values(socketUsers).map((u) => u);
+
+        let recipient = await recipients.find(
+            (u) => u.user._id == id.anotherUser._id
+        );
+
+        let followers = await id.anotherUser.followers.map((a) => a._id);
+
+        if (!recipient) {
+            return;
+        }
+
+        if (!followers.includes(id.user._id)) {
+            recipient.socket.emit("notification");
+        }
+    });
+});
 
 const PORT = process.env.PORT || 5000;
 
