@@ -68,35 +68,31 @@ io.on("connection", (socket) => {
     });
 
     socket.on("like", async (user, post) => {
-        if (!post.post.likedBy.includes(user.user._id)) {
-            let recipients = Object.values(socketUsers).map((u) => u);
+        let recipients = Object.values(socketUsers).map((u) => u);
 
-            let recipient = await recipients.find(
-                (u) => u.user._id == post.post.by._id
-            );
+        let recipient = await recipients.find(
+            (u) => u.user._id == post.post.by._id
+        );
 
-            if (!recipient) {
-                return;
-            }
-
-            recipient.socket.emit("notification");
+        if (!recipient) {
+            return;
         }
+
+        recipient.socket.emit("notification");
     });
 
     socket.on("dislike", async (user, post) => {
-        if (!post.post.dislikedBy.includes(user.user._id)) {
-            let recipients = Object.values(socketUsers).map((u) => u);
+        let recipients = Object.values(socketUsers).map((u) => u);
 
-            let recipient = await recipients.find(
-                (u) => u.user._id == post.post.by._id
-            );
+        let recipient = await recipients.find(
+            (u) => u.user._id == post.post.by._id
+        );
 
-            if (!recipient) {
-                return;
-            }
-
-            recipient.socket.emit("notification");
+        if (!recipient) {
+            return;
         }
+
+        recipient.socket.emit("notification");
     });
 
     socket.on("comment", async (comment) => {
