@@ -7,6 +7,6 @@ exports.getAnotherPost = async (req, res) => {
         res.json(post);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send("Server error");
+        return res.json({ status: "Invalid post." });
     }
 };
