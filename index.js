@@ -31,8 +31,8 @@ mongoDB();
 const io = require("socket.io")(server);
 
 app.use(cors());
-app.use(express.json({ extended: false }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.post("/signup", signup);
@@ -67,46 +67,52 @@ io.on("connection", (socket) => {
         delete socketUsers[socket.id];
     });
 
-    socket.on("like", async (user, post) => {
+    socket.on("like", async (id) => {
         let recipients = Object.values(socketUsers).map((u) => u);
 
         let recipient = await recipients.find(
-            (u) => u.user._id == post.post.by._id
+            (u) => u.user._id == id.anotherUser.by._id
         );
 
         if (!recipient) {
             return;
         }
 
-        recipient.socket.emit("notification");
+        if (recipient.user._id === id.anotherUser.by._id) {
+            recipient.socket.emit("notification");
+        }
     });
 
-    socket.on("dislike", async (user, post) => {
+    socket.on("dislike", async (id) => {
         let recipients = Object.values(socketUsers).map((u) => u);
 
         let recipient = await recipients.find(
-            (u) => u.user._id == post.post.by._id
+            (u) => u.user._id == id.anotherUser.by._id
         );
 
         if (!recipient) {
             return;
         }
 
-        recipient.socket.emit("notification");
+        if (recipient.user._id === id.anotherUser.by._id) {
+            recipient.socket.emit("notification");
+        }
     });
 
-    socket.on("comment", async (comment) => {
+    socket.on("comment", async (id) => {
         let recipients = Object.values(socketUsers).map((u) => u);
 
         let recipient = await recipients.find(
-            (u) => u.user._id == comment.user.by._id
+            (u) => u.user._id == id.anotherUser._id
         );
 
         if (!recipient) {
             return;
         }
 
-        recipient.socket.emit("notification");
+        if (recipient.user._id !== id.user._id) {
+            recipient.socket.emit("notification");
+        }
     });
 
     socket.on("follow", async (id) => {
